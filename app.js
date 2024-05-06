@@ -53,42 +53,59 @@ function addRelationship() {
 }
 
 function applyGreedyAlgorithm() {
-  const nodesArray = nodes.getIds();
+  let nodesArray = nodes.getIds();
   const colors = {};
-  // Define a palette of colors for simplicity. You can expand this list or generate colors dynamically.
   const colorPalette = [
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#57FFF3",
-    "#F357FF",
-    "#FFFF57",
-    "#F3571E",
+    { color: "#FF5733", name: "Red" },
+    { color: "#33FF57", name: "Green" },
+    { color: "#3357FF", name: "Blue" },
+    { color: "#57FFF3", name: "Cyan" },
+    { color: "#F357FF", name: "Magenta" },
+    { color: "#FFFF57", name: "Yellow" },
+    { color: "#F3571E", name: "Orange" },
   ];
 
-  //shuffle the nodes array to get a random order
+  // Shuffle to simulate randomness in selection
   nodesArray.sort(() => Math.random() - 0.5);
+
+  //start time recording
+  const startTime = performance.now();
 
   nodesArray.forEach((node) => {
     const connectedNodes = network.getConnectedNodes(node);
     const usedColors = connectedNodes
       .map((n) => colors[n])
       .filter((n) => n !== undefined);
+
     let colorIndex = 0;
     while (usedColors.includes(colorPalette[colorIndex].color)) {
       colorIndex++;
     }
+
     colors[node] = colorPalette[colorIndex].color;
+
+    // Update the node color in the network
     nodes.update({
       id: node,
       color: { background: colorPalette[colorIndex].color, border: "#2B7CE9" },
+      label: `${node}`,
     });
   });
 
+  //end time recording
+  const endTime = performance.now();
+
+  //calculate duration
+  const duration = (endTime - startTime).toFixed(2);
+
   let maxColorIndex = Math.max(
-    ...Object.values(colors).map((color) => colorPalette.indexOf(color))
+    ...Object.values(colors).map((color) =>
+      colorPalette.findIndex((palette) => palette.color === color)
+    )
   );
-  alert(`Greedy coloring applied. Colors used: ${maxColorIndex + 1}`);
+  document.getElementById("algorithmResult").textContent = `Colors used: ${
+    maxColorIndex + 1
+  }. Calculation time: ${duration}ms`;
 }
 
 function getRandomName() {
@@ -159,6 +176,13 @@ function applyGreedyAlgorithmInstant() {
 }
 
 function prepareGreedySteps() {
+  //reset network
+  nodes.forEach((node) => {
+    nodes.update({
+      id: node.id,
+      color: null,
+    });
+  });
   let nodesArray = nodes.getIds();
   let stepIndex = 0;
   steps = [];
