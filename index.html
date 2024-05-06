@@ -6,6 +6,7 @@
     <title>Graph-based Seating Arrangement</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
   </head>
   <body>
     <div id="mynetwork"></div>
@@ -24,6 +25,25 @@
         Add Non-sitting Relationship
       </button>
     </form>
+    <button type="button" onclick="generateRandomParticipants()">
+      Generate Random Participants
+    </button>
+    <input
+      type="number"
+      id="numParticipants"
+      placeholder="Number of participants"
+      min="1"
+    />
+    <input
+      type="number"
+      id="nonSeatingPercentage"
+      placeholder="Non-seating % (0-100)"
+      min="0"
+      max="100"
+    />
+    <button type="button" onclick="applyGreedyAlgorithm()">
+      Apply Greedy Algorithm
+    </button>
     <script src="app.js"></script>
   </body>
 </html>
