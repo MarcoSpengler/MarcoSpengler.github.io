@@ -10,40 +10,62 @@
   </head>
   <body>
     <div id="mynetwork"></div>
-    <form id="inputForm">
-      <input
-        type="text"
-        id="participantName"
-        placeholder="Enter participant name"
-      />
-      <button type="button" onclick="addParticipant()">Add Participant</button>
-    </form>
-    <form id="relationshipForm" style="display: none">
-      <select id="firstParticipant"></select>
-      <select id="secondParticipant"></select>
-      <button type="button" onclick="addRelationship()">
-        Add Non-sitting Relationship
-      </button>
-    </form>
-    <button type="button" onclick="generateRandomParticipants()">
-      Generate Random Participants
-    </button>
-    <input
-      type="number"
-      id="numParticipants"
-      placeholder="Number of participants"
-      min="1"
-    />
-    <input
-      type="number"
-      id="nonSeatingPercentage"
-      placeholder="Non-seating % (0-100)"
-      min="0"
-      max="100"
-    />
-    <button type="button" onclick="applyGreedyAlgorithm()">
-      Apply Greedy Algorithm
-    </button>
+    <div
+      id="algorithmResult"
+      style="font-size: 20px; color: #333; padding: 20px"
+    ></div>
+    <div class="controls-container">
+      <div class="column">
+        <form id="inputForm">
+          <input
+            type="text"
+            id="participantName"
+            placeholder="Enter participant name"
+          />
+          <button type="button" onclick="addParticipant()">
+            Add Participant
+          </button>
+        </form>
+        <form id="relationshipForm" style="display: none">
+          <select id="firstParticipant"></select>
+          <select id="secondParticipant"></select>
+          <button type="button" onclick="addRelationship()">
+            Add Non-sitting Relationship
+          </button>
+        </form>
+      </div>
+      <div class="column">
+        <input
+          type="number"
+          id="numParticipants"
+          placeholder="Number of participants"
+          min="1"
+        />
+        <input
+          type="number"
+          id="nonSeatingPercentage"
+          placeholder="Non-seating % (0-100)"
+          min="0"
+          max="100"
+        />
+        <button type="button" onclick="generateRandomParticipants()">
+          Generate Random Participants
+        </button>
+      </div>
+      <div class="column">
+        <button type="button" onclick="applyGreedyAlgorithmInstant()">
+          Apply Greedy Algorithm Instantly
+        </button>
+        <button type="button" onclick="startGreedyStepByStep()">
+          Apply Greedy Step by Step
+        </button>
+        <!--button to continue greedy step by step called "next step"-->
+        <button type="button" onclick="continueGreedyStepByStep()">
+          Next Step
+        </button>
+        <div id="algorithmResult"></div>
+      </div>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>
