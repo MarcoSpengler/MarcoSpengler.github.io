@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website</title>
-</head>
-<body>
-    <h1>Hello world!</h1>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graph-based Seating Arrangement</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  </head>
+  <body>
+    <div id="mynetwork"></div>
+    <form id="inputForm">
+      <input
+        type="text"
+        id="participantName"
+        placeholder="Enter participant name"
+      />
+      <button type="button" onclick="addParticipant()">Add Participant</button>
+    </form>
+    <form id="relationshipForm" style="display: none">
+      <select id="firstParticipant"></select>
+      <select id="secondParticipant"></select>
+      <button type="button" onclick="addRelationship()">
+        Add Non-sitting Relationship
+      </button>
+    </form>
+    <script src="app.js"></script>
+  </body>
 </html>
