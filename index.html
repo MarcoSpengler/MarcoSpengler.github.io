@@ -40,13 +40,15 @@
           id="numParticipants"
           placeholder="Number of participants"
           min="1"
+          value="25"
         />
         <input
           type="number"
-          id="nonSeatingPercentage"
-          placeholder="Non-seating % (0-100)"
+          id="NSRF"
+          placeholder="Non-seating ratio (0-1)"
           min="0"
           max="100"
+          value="0.2"
         />
         <button type="button" onclick="generateRandomParticipants()">
           Generate Random Participants
@@ -57,13 +59,39 @@
           Apply Greedy Algorithm Instantly
         </button>
         <button type="button" onclick="startGreedyStepByStep()">
-          Apply Greedy Step by Step
+          Start Greedy Step by Step
         </button>
         <!--button to continue greedy step by step called "next step"-->
         <button type="button" onclick="continueGreedyStepByStep()">
           Next Step
         </button>
         <div id="algorithmResult"></div>
+      </div>
+      <div class="column">
+        <button type="button" onclick="applyColorWithInterchange()">
+          Apply Color-with-Interchange
+        </button>
+        <button type="button" onclick="applyDsatur()">Apply Dsatur</button>
+        <button type="button" onclick="applyBacktracking()">
+          Apply Backtracking
+        </button>
+      </div>
+      <div class="benchmark">
+        <select id="algorithmSelector">
+          <option value="greedy">Greedy</option>
+          <option value="colorWithInterchange">Color-with-Interchange</option>
+          <option value="dsatur">Dsatur</option>
+          <option value="backtracking">Backtracking</option>
+        </select>
+        <input
+          type="number"
+          id="numRuns"
+          placeholder="Number of runs"
+          min="1"
+        />
+        <button type="button" onclick="benchmarkAlgorithm()">
+          Benchmark Algorithm
+        </button>
       </div>
     </div>
     <script src="app.js"></script>

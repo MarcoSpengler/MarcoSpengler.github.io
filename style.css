@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,10 +8,10 @@ body {
 
 #mynetwork {
   width: 80%;
-  height: 700px;
+  height: 600px;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 .controls-container {
@@ -49,4 +49,18 @@ button:hover {
   margin-top: 20px;
   font-size: 18px;
   color: #333;
+}
+
+.benchmark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.benchmark select,
+.benchmark input,
+.benchmark button {
+  margin-bottom: 10px;
+  padding: 10px;
 }
