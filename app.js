@@ -154,8 +154,6 @@ function generateRandomParticipants() {
     nodes.add({ id: randomName, label: randomName });
   }
 
-  console.log("test", participants);
-
   // Generate random non-sitting relationships
   const totalPairs = Math.round(
     NSRF * ((numParticipants * (numParticipants - 1)) / 2)
@@ -543,7 +541,7 @@ function benchmarkAlgorithm() {
   edges.add(networkData.edges);
   // iterate over the nodes and set the right color for every node id
   nodes.forEach((node) => {
-    node.color = colors[node.id];
+    node.color.background = colors[node.id];
     nodes.update(node);
   });
 
