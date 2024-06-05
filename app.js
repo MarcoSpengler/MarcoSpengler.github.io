@@ -9,6 +9,19 @@ const data = {
 const options = {};
 const network = new vis.Network(container, data, options);
 
+const colorPalette = [
+  { color: "#FF5733", name: "Red" },
+  { color: "#33FF57", name: "Green" },
+  { color: "#3357FF", name: "Blue" },
+  { color: "#57FFF3", name: "Cyan" },
+  { color: "#F357FF", name: "Magenta" },
+  { color: "#FFFF57", name: "Yellow" },
+  { color: "#F3571E", name: "Orange" },
+  { color: "#9B59B6", name: "Violet" },
+  { color: "#8E44AD", name: "Purple" },
+  { color: "#E74C3C", name: "Brown" },
+];
+
 function addParticipant() {
   const participantName = document
     .getElementById("participantName")
@@ -50,63 +63,6 @@ function addRelationship() {
   } else {
     alert("Please select different participants");
   }
-}
-
-function applyGreedyAlgorithm() {
-  let nodesArray = nodes.getIds();
-  const colors = {};
-  const colorPalette = [
-    { color: "#FF5733", name: "Red" },
-    { color: "#33FF57", name: "Green" },
-    { color: "#3357FF", name: "Blue" },
-    { color: "#57FFF3", name: "Cyan" },
-    { color: "#F357FF", name: "Magenta" },
-    { color: "#FFFF57", name: "Yellow" },
-    { color: "#F3571E", name: "Orange" },
-  ];
-
-  // Shuffle to simulate randomness in selection
-  nodesArray.sort(() => Math.random() - 0.5);
-
-  //start time recording
-  const startTime = performance.now();
-
-  nodesArray.forEach((node) => {
-    const connectedNodes = network.getConnectedNodes(node);
-    const usedColors = connectedNodes
-      .map((n) => colors[n])
-      .filter((n) => n !== undefined);
-
-    let colorIndex = 0;
-    while (usedColors.includes(colorPalette[colorIndex].color)) {
-      colorIndex++;
-    }
-
-    colors[node] = colorPalette[colorIndex].color;
-
-    // Update the node color in the network
-    nodes.update({
-      id: node,
-      color: { background: colorPalette[colorIndex].color, border: "#2B7CE9" },
-      label: `${node}`,
-    });
-  });
-
-  //end time recording
-  const endTime = performance.now();
-
-  //calculate duration
-  const duration = (endTime - startTime).toFixed(2);
-
-  let maxColorIndex = Math.max(
-    ...Object.values(colors).map((color) =>
-      colorPalette.findIndex((palette) => palette.color === color)
-    )
-  );
-  document.getElementById("algorithmResult").textContent = `Colors used: ${
-    maxColorIndex + 1
-  }. Calculation time: ${duration}ms`;
-  return maxColorIndex + 1;
 }
 
 function getRandomName() {
@@ -180,65 +136,41 @@ function generateRandomParticipants() {
   }
 
   updateDropdowns(); // Update dropdowns with new participants
+  steps = [];
+  currentStep = 0;
   document.getElementById("relationshipForm").style.display = "block"; // Show relationship form
 }
 
 let steps = [];
 let currentStep = 0;
 
-function applyGreedyAlgorithmInstant() {
-  const startTime = performance.now();
-  applyGreedyAlgorithm(); // Greedy-Algorithmus wie bereits implementiert
-  const endTime = performance.now();
-  const duration = (endTime - startTime).toFixed(2);
-  document.getElementById("algorithmResult").textContent = `Colors used: ${
-    Object.keys(colors).length
-  }. Calculation time: ${duration}ms`;
-}
-
-function prepareGreedySteps() {
-  //reset network
-  nodes.forEach((node) => {
-    nodes.update({
-      id: node.id,
-      color: null,
-    });
-  });
+function applyGreedyAlgorithm(returnSteps = false) {
   let nodesArray = nodes.getIds();
-  let stepIndex = 0;
-  steps = [];
+  const colors = {};
+
+  uncolorGraph();
 
   // Shuffle to simulate randomness in selection
   nodesArray.sort(() => Math.random() - 0.5);
 
-  const colors = {};
-  const colorPalette = [
-    { color: "#FF5733", name: "Red" },
-    { color: "#33FF57", name: "Green" },
-    { color: "#3357FF", name: "Blue" },
-    { color: "#57FFF3", name: "Cyan" },
-    { color: "#F357FF", name: "Magenta" },
-    { color: "#FFFF57", name: "Yellow" },
-    { color: "#F3571E", name: "Orange" },
-  ];
+  let stepIndex = 0;
 
   nodesArray.forEach((node) => {
     const connectedNodes = network.getConnectedNodes(node);
     const usedColors = connectedNodes
       .map((n) => colors[n])
       .filter((n) => n !== undefined);
+
     let colorIndex = 0;
     const conflictingColors = [];
 
     while (usedColors.includes(colorPalette[colorIndex].color)) {
-      // Collect conflicting colors' names before incrementing the index
       conflictingColors.push(colorPalette[colorIndex].name);
       colorIndex++;
     }
 
     colors[node] = colorPalette[colorIndex].color;
 
-    // If there are adjacent nodes sharing the color of the current node, name the color as a conflict
     if (conflictingColors.length > 0) {
       steps.push({
         node,
@@ -249,7 +181,6 @@ function prepareGreedySteps() {
         stepIndex: stepIndex++,
       });
     } else {
-      // If there are no adjacent nodes sharing the color, assign it without conflict
       steps.push({
         node,
         color: colorPalette[colorIndex].color,
@@ -258,7 +189,30 @@ function prepareGreedySteps() {
       });
     }
   });
-  return steps;
+
+  if (returnSteps) {
+    return steps;
+  } else {
+    // Apply the colors to the network
+    nodesArray.forEach((node) => {
+      nodes.update({
+        id: node,
+        color: { background: colors[node], border: "#2B7CE9" },
+        label: `${node}`,
+      });
+    });
+
+    let maxColorIndex = Math.max(
+      ...Object.values(colors).map((color) =>
+        colorPalette.findIndex((palette) => palette.color === color)
+      )
+    );
+    document.getElementById("algorithmResult").textContent = `Colors used: ${
+      maxColorIndex + 1
+    }`;
+
+    return maxColorIndex + 1;
+  }
 }
 
 function executeStep(step) {
@@ -269,35 +223,47 @@ function executeStep(step) {
   document.getElementById("algorithmResult").textContent = step.description;
 }
 
-function startGreedyStepByStep() {
-  prepareGreedySteps();
+function startAlgorithmStepByStep() {
   currentStep = 0;
-  continueGreedyStepByStep();
+  continueAlgorithmStepByStep();
 }
 
-function continueGreedyStepByStep() {
+function continueAlgorithmStepByStep() {
   if (currentStep < steps.length) {
+    console.log(currentStep);
+    console.log(steps[currentStep]);
     executeStep(steps[currentStep]);
     currentStep++;
   } else {
+    //check how many colors were used to color the nodes in the network
+    const uniqueColors = new Set();
+    nodes.forEach((node) => {
+      const color = nodes.get(node).color;
+      if (color && !uniqueColors.has(color)) {
+        uniqueColors.add(color);
+      }
+    });
+
     document.getElementById("algorithmResult").textContent =
-      "Algorithm completed";
+      "Algorithm completed. Number of colors used: " + uniqueColors.size;
+  }
+}
+
+function startStepByStep() {
+  uncolorGraph();
+  // if dropdown value is "greedy"
+  const type = document.getElementById("algorithmSelectorForStepByStep").value;
+  if (type === "greedy") {
+    console.log("step by step greedy");
+    startAlgorithmStepByStep(applyGreedyAlgorithm(true));
+  } else if (type === "dsatur") {
+    startAlgorithmStepByStep(applyDsatur(true));
   }
 }
 
 function applyColorWithInterchange() {
   let nodesArray = nodes.getIds();
   const colors = {}; // This will hold the color assigned to each node
-  const colorPalette = [
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#57FFF3",
-    "#F357FF",
-    "#FFFF57",
-    "#F3571E",
-  ]; // Example color codes
-
   // Shuffle to simulate randomness in selection
   nodesArray.sort(() => Math.random() - 0.5);
 
@@ -306,8 +272,9 @@ function applyColorWithInterchange() {
     colors[node] = 0; // '0' will denote uncolored
   });
 
-  // save start time
+  // Save start time
   const startTime = performance.now();
+  let usedColors = new Set();
 
   // Attempt to color each node
   nodesArray.forEach((v) => {
@@ -321,36 +288,50 @@ function applyColorWithInterchange() {
       }
     });
 
-    if (availableColors.size === 0) {
-      // Try to resolve conflict by color interchange
+    if (
+      availableColors.size === 0 ||
+      (usedColors.size < colorPalette.length &&
+        !availableColors.has(Array.from(usedColors)[0]))
+    ) {
+      let resolved = false;
       for (let u of neighbors) {
         if (colors[u] !== 0 && !availableColors.has(colors[u])) {
           // Check if swapping colors resolves the conflict
-          let tempColor = colors[u];
-          colors[u] = colors[v]; // Temporarily swap colors
-          availableColors.add(colors[v]);
-          if (
-            network.getConnectedNodes(u).every((x) => colors[x] !== colors[u])
-          ) {
-            colors[v] = tempColor; // Assign the swapped color to v
-            break;
-          } else {
-            colors[u] = tempColor; // Swap back if it does not resolve
+          let otherNeighbors = network.getConnectedNodes(u);
+          for (let possibleColor of colorPalette) {
+            if (!otherNeighbors.some((x) => colors[x] === possibleColor)) {
+              // Perform the color swap
+              let tempColor = colors[u];
+              colors[u] = colors[v]; // Temporarily swap colors
+              colors[v] = tempColor;
+              availableColors.add(tempColor);
+              resolved = true;
+              console.log(
+                `Resolved conflict by interchanging colors between node ${v} and ${u}.`
+              );
+              break;
+            }
           }
         }
+        if (resolved) break;
       }
-      if (availableColors.size === 0) {
+      if (!resolved) {
         console.log(
-          `No available colors and no successful interchange for vertex ${v}.`
+          `No interchange possible for vertex ${v}. Assigning new color.`
         );
-        return; // If no color is available and no interchange is possible, skip this vertex
+        // If no color is available and no interchange is possible, use a new color
+        colors[v] = Array.from(colorPalette).find(
+          (color) => !usedColors.has(color)
+        );
+        usedColors.add(colors[v]);
       }
-    }
-
-    if (availableColors.size > 0 && colors[v] === 0) {
-      colors[v] = Array.from(availableColors)[0]; // Assign the smallest available color
+    } else {
+      // Assign the smallest available color
+      colors[v] = Array.from(availableColors)[0];
+      usedColors.add(colors[v]);
       console.log(`Assigned color ${colors[v]} to vertex ${v}.`);
     }
+
     nodes.update({
       id: v,
       color: { background: colors[v], border: "#2B7CE9" },
@@ -358,11 +339,11 @@ function applyColorWithInterchange() {
     });
   });
 
-  // save end time
+  // Save end time and calculate duration
   const endTime = performance.now();
   const duration = (endTime - startTime).toFixed(2);
 
-  // Output unique colors used
+  // Output the unique colors used
   const uniqueColors = new Set(
     Object.values(colors).filter((color) => color !== 0)
   );
@@ -371,12 +352,10 @@ function applyColorWithInterchange() {
   ).textContent = `Colors used: ${uniqueColors.size}. Calculation time: ${duration}ms`;
 
   console.log("Color-With-Interchange Algorithm applied.");
-
-  // return the number of unique colors used
-  return uniqueColors.size;
+  return uniqueColors.size; // Return the number of unique colors used
 }
 
-function applyDsatur() {
+function applyDsatur(returnSteps = false) {
   let nodesArray = nodes.getIds();
   const degrees = {};
   const saturation = {};
@@ -386,16 +365,10 @@ function applyDsatur() {
   });
 
   const colors = {};
-  const colorPalette = [
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#57FFF3",
-    "#F357FF",
-    "#FFFF57",
-    "#F3571E",
-  ];
+
   const usedColorsByNode = {};
+
+  let stepIndex = 0;
 
   // Initialize the used colors set for each node
   nodesArray.forEach((node) => {
@@ -427,9 +400,10 @@ function applyDsatur() {
     });
 
     const availableColors = colorPalette.filter(
-      (color) => !usedColorsByNode[nextNode].has(color)
+      (color) => !usedColorsByNode[nextNode].has(color.color)
     );
-    const selectedColor = availableColors[0]; // Select the first available color
+    const selectedColor = availableColors[0].color; // Select the first available color
+    const colorName = availableColors[0].name;
     colors[nextNode] = selectedColor;
 
     // Update saturation of adjacent nodes
@@ -441,12 +415,21 @@ function applyDsatur() {
       }
     });
 
-    // Update node color in the network
-    nodes.update({
-      id: nextNode,
-      color: { background: selectedColor, border: "#2B7CE9" },
-      label: `${nextNode}`,
-    });
+    // Update node color in the network or push a step
+    if (returnSteps) {
+      steps.push({
+        node: nextNode,
+        color: selectedColor,
+        description: `Node ${nextNode} gets the color ${colorName} because it has the highest saturation of ${saturation[nextNode]} so it is the next node to be colored.`,
+        stepIndex: stepIndex++,
+      });
+    } else {
+      nodes.update({
+        id: nextNode,
+        color: { background: selectedColor, border: "#2B7CE9" },
+        label: `${nextNode}`,
+      });
+    }
 
     console.log(
       `Node ${nextNode} colored with ${selectedColor} (Available Colors: ${availableColors.join(
@@ -464,7 +447,7 @@ function applyDsatur() {
   document.getElementById(
     "algorithmResult"
   ).textContent = `Colors used: ${uniqueColorsUsed.size}`;
-  return uniqueColorsUsed.size; // Return the number of unique colors used
+  return returnSteps ? steps : uniqueColorsUsed.size; // Return the number of unique colors used
 }
 
 function applyBacktracking() {
@@ -488,7 +471,7 @@ function benchmarkAlgorithm() {
     nodes: nodes.get(),
     edges: edges.get(),
   };
-  let colors = {};
+  let savedColors = {};
 
   for (let i = 0; i < numRuns; i++) {
     console.log(`Run ${i + 1}`);
@@ -520,10 +503,10 @@ function benchmarkAlgorithm() {
       };
       // also safe the colors used for each node
       nodes.forEach((node) => {
-        colors[node.id] = node.color.background;
+        savedColors[node.id] = node.color.background;
       });
-      console.log("colors", colors);
-      networkData.colors = colors;
+      console.log("colors", savedColors);
+      networkData.colors = savedColors;
     }
 
     totalTime += endTime - startTime;
@@ -532,17 +515,12 @@ function benchmarkAlgorithm() {
   const avgTime = totalTime / numRuns;
   const avgColorsUsed = totalColorsUsed / numRuns;
 
-  console.log("networkData", networkData);
-
-  //set the network to the state with the minimum colors used
-  nodes.clear();
-  edges.clear();
-  nodes.add(networkData.nodes);
-  edges.add(networkData.edges);
-  // iterate over the nodes and set the right color for every node id
+  //apply saved colors
   nodes.forEach((node) => {
-    node.color.background = colors[node.id];
-    nodes.update(node);
+    nodes.update({
+      id: node.id,
+      color: { background: savedColors[node.id], border: "#2B7CE9" },
+    });
   });
 
   document.getElementById(
@@ -552,4 +530,14 @@ function benchmarkAlgorithm() {
   )} ms. Average colors used: ${avgColorsUsed.toFixed(
     2
   )}. Minimum colors used: ${minColorsUsed}`;
+}
+
+function uncolorGraph() {
+  //reset network
+  nodes.forEach((node) => {
+    nodes.update({
+      id: node.id,
+      color: null,
+    });
+  });
 }

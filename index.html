@@ -55,19 +55,27 @@
         </button>
       </div>
       <div class="column">
-        <button type="button" onclick="applyGreedyAlgorithmInstant()">
-          Apply Greedy Algorithm Instantly
+        <select id="algorithmSelectorForStepByStep">
+          <option value="greedy">Greedy</option>
+          <option value="colorWithInterchange">Color-with-Interchange</option>
+          <option value="dsatur">Dsatur</option>
+          <option value="backtracking">Backtracking</option>
+        </select>
+        <button type="button" onclick="startStepByStep()">
+          Start Step by Step
         </button>
-        <button type="button" onclick="startGreedyStepByStep()">
-          Start Greedy Step by Step
-        </button>
-        <!--button to continue greedy step by step called "next step"-->
-        <button type="button" onclick="continueGreedyStepByStep()">
+        <!-- <button type="button" onclick="prepareDsaturSteps()">
+          Reset Colors
+        </button> -->
+        <button type="button" onclick="continueAlgorithmStepByStep()">
           Next Step
         </button>
         <div id="algorithmResult"></div>
       </div>
       <div class="column">
+        <button type="button" onclick="applyGreedyAlgorithm()">
+          Apply Greedy Algorithm
+        </button>
         <button type="button" onclick="applyColorWithInterchange()">
           Apply Color-with-Interchange
         </button>
