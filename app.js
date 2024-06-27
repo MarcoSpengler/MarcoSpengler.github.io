@@ -141,6 +141,32 @@ function generateRandomParticipants() {
   document.getElementById("relationshipForm").style.display = "block"; // Show relationship form
 }
 
+function generateWheelGraph() {
+  nodes.clear();
+  edges.clear();
+  // generate wheel graph consising of 10 participants each with a getRandomName
+  let firstParticipant = null;
+
+  // add first participant
+  const participantName = getRandomName();
+  if (!firstParticipant) {
+    firstParticipant = participantName;
+  }
+  nodes.add({ id: 0, label: participantName });
+
+  for (let i = 1; i < 9; i++) {
+    const participantName = getRandomName();
+    nodes.add({ id: i, label: participantName });
+    // add edges between this participant and the first participant and the previous participant
+    edges.add({ from: i, to: 0 });
+    if (i > 1) {
+      edges.add({ from: i, to: i - 1 });
+    }
+  }
+  //connect the first participant to the last participant
+  edges.add({ from: 1, to: 8 });
+}
+
 let steps = [];
 let currentStep = 0;
 
@@ -262,6 +288,7 @@ function startStepByStep() {
 }
 
 function applyColorWithInterchange() {
+  uncolorGraph();
   let nodesArray = nodes.getIds();
   const colors = {}; // This will hold the color assigned to each node
   // Shuffle to simulate randomness in selection
@@ -356,7 +383,12 @@ function applyColorWithInterchange() {
 }
 
 function applyDsatur(returnSteps = false) {
+  uncolorGraph();
   let nodesArray = nodes.getIds();
+
+  // Shuffle to simulate randomness in selection
+  nodesArray.sort(() => Math.random() - 0.5);
+
   const degrees = {};
   const saturation = {};
   nodesArray.forEach((node) => {
