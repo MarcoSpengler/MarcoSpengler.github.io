@@ -167,6 +167,33 @@ function generateWheelGraph() {
   edges.add({ from: 1, to: 8 });
 }
 
+function generateProblematicGraph() {
+  nodes.clear();
+  edges.clear();
+
+  nodes.add({ id: "A", label: "A" });
+  nodes.add({ id: "B", label: "B" });
+  nodes.add({ id: "C", label: "C" });
+  nodes.add({ id: "D", label: "D" });
+  nodes.add({ id: "E", label: "E" });
+  nodes.add({ id: "F", label: "F" });
+  nodes.add({ id: "G", label: "G" });
+  nodes.add({ id: "H", label: "H" });
+
+  edges.add({ from: "A", to: "B" });
+  edges.add({ from: "A", to: "C" });
+  edges.add({ from: "B", to: "C" });
+  edges.add({ from: "B", to: "D" });
+  edges.add({ from: "C", to: "D" });
+  edges.add({ from: "E", to: "F" });
+  edges.add({ from: "E", to: "G" });
+  edges.add({ from: "F", to: "H" });
+  edges.add({ from: "G", to: "H" });
+  edges.add({ from: "E", to: "H" });
+  edges.add({ from: "B", to: "F" });
+  edges.add({ from: "C", to: "G" });
+}
+
 let steps = [];
 let currentStep = 0;
 
@@ -263,8 +290,8 @@ function continueAlgorithmStepByStep() {
   } else {
     //check how many colors were used to color the nodes in the network
     const uniqueColors = new Set();
-    nodes.forEach((node) => {
-      const color = nodes.get(node).color;
+    steps.forEach((step) => {
+      const color = step.color;
       if (color && !uniqueColors.has(color)) {
         uniqueColors.add(color);
       }
